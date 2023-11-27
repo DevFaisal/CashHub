@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Input from "./input";
-import Button from "./button";
+import Input from "./Input";
+import Button from "./Button";
 import { regImage } from "../assets/images";
-// import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { loginUserService, getCurrentUser } from "../services/user";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,24 +10,28 @@ import { login as authLogin } from "../store/authStore";
 
 
 function Login() {
-    // const navigate = useNavigate()
+    const navigate = useNavigate()
     const dispatch = useDispatch();
     const { register, handleSubmit } = useForm();
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const authState = useSelector((state) => state.auth);
-    console.log(authState);
+    console.log(authState.userData);
 
     const login = async (data) => {
         setError("");
         try {
+            setLoading(true)
             const session = await getCurrentUser(data);
 
             if (session) {
                 const userData = await loginUserService(data);
                 if (userData) dispatch(authLogin(userData.data));
+                setLoading(false)
+                navigate("/home")
             } else {
+                setLoading(false)
                 setError("Invalid Credentials");
             }
         } catch (error) {
@@ -56,12 +60,12 @@ function Login() {
                             />
                             <Button
                                 type="submit"
-                                children="Login"
+                                children={loading ? "Loading..." : "Login"}
                                 textColor="text-black"
                                 className="font-semibold"
                             />
                             <p className="text-sm text-gray-300 font-semibold text-center">
-                                Not a member? <span className="text-red-400">Register now</span>
+                                Not a member? <span className="text-red-400"> <Link to={"/signup"}>Register now</Link> </span>
                             </p>
                             {error && (
                                 <p className="text-center px-4 py-2 text-red-600 rounded-lg mb-4 font-semibold">

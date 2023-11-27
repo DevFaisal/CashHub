@@ -5,63 +5,74 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from "../utils/ApiResponse.js"
 
 const registerUser = asyncHandler(async (req, res, next) => {
-    // get Userdetails from frontEnd
-    // Validation - not empty
-    // Check if user already exists - email
-    // check from avatar
-    // upload them to cloudnary, avatar
-    // creat user Object -create entry in DB
-    // remove password from response
-    // check for user creation
-    // return response
 
     const { fullName, email, password } = req.body;
 
-    if (
-        [fullName, email, password].some((field) => {
-            return field?.trim() === ""
+    try {
+        if (
+            [fullName, email, password].some((field) => {
+                return field?.trim() === ""
+            })
+        ) {
+            throw new ApiError(400, "All fields are required")
+        }
+
+        const existedUser = await User.findOne({ email })
+
+        if (existedUser) {
+            throw new ApiError(409, "User already exists")
+        }
+
+        const avatarLocalpath = req.file?.path
+
+        if (!avatarLocalpath) {
+            throw new ApiError(400, "Upload your Profile")
+        }
+
+        const avatar = await uploadOnCloudinary(avatarLocalpath)
+
+        const craetedUser = await User.create({
+            fullName,
+            email,
+            password,
+            avatar: avatar.url
         })
-    ) {
-        throw new ApiError(400, "All fields are required")
-    }
+        if (craetedUser) {
 
-    const existedUser = await User.findOne({ email })
-
-    if (existedUser) {
-        throw new ApiError(409, "User already exists")
-    }
-
-    const avatarLocalpath = req.file?.path
-
-    if (!avatarLocalpath) {
-        throw new ApiError(400, "Upload your Profile")
-    }
-
-    const avatar = await uploadOnCloudinary(avatarLocalpath)
-
-    const craetedUser = await User.create({
-        fullName,
-        email,
-        password,
-        avatar: avatar.url
-    }).then((res) => {
-        console.log("User Created")
-    })
-        .catch((err) => {
+            return res.status(200).json(
+                new ApiResponse(200, craetedUser, "User Created")
+            )
+        }
+        else {
             throw new ApiError(500, "Internal Server Error")
-        })
+        }
 
-
-    return res.status(200).json(
-        new ApiResponse(200, craetedUser, "User Created")
-    )
-
+    } catch (error) {
+        res.status(error.statusCode).send(error.message)
+    }
 })
 
 const loginUser = asyncHandler(async (req, res, next) => {
+    //Check all fields are required
+    //Then search in the Database for the specific usee with his email
+    //Then return the body excluding password
+
     const { email, password } = req.body
-    const user = req.body
-    res.status(200).json(new ApiResponse(200, user, "User found"))
+    try {
+        if (!email || !password) throw new ApiError(400, "All fields are required")
+
+        const user = await User.findOne({ email })
+        if (user) {
+            res.status(200).json(new ApiResponse(200, user, "User found"))
+        }
+        else {
+            throw new ApiError(410, "No User Found")
+        }
+    }
+    catch (err) {
+        res.status(error.statusCode).send(error.message)
+    }
+
 })
 
 const currentUser = asyncHandler(async (req, res, next) => {

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Button from "./button";
-import Input from "./input";
+import Button from "./Button";
+import Input from "./Input";
 import { useForm } from "react-hook-form";
-import { createUserService, loginUserService, getCurrentUser } from "../services/user";
+import { createUserService } from "../services/user";
 import { avatar, regImage } from "../assets/images";
-// import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+
 
 function Signup() {
 
@@ -12,6 +13,7 @@ function Signup() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false);
     const [profile, setProfile] = useState(avatar)
+    const navigate = useNavigate()
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -21,30 +23,32 @@ function Signup() {
         }
     };
 
-    const registerUser = async (data, event) => {
-        event.preventDefault()
-        console.log(data)
+    const registerUser = async (data) => {
         setError("")
         try {
-            const session = await getCurrentUser(data);
-            console.log(session)
-            if (!session) {
-                const newUser = await createUserService(data)
+            setLoading(true)
+            const newUser = await createUserService(data)
+
+            if (newUser) {
+                setLoading(false)
+                navigate('/login')
             }
 
         } catch (error) {
-            setError(error)
+            setLoading(false)
+            setError(error.response.data || 'An error occurred. Please try again.');
         }
     }
 
     return (
         <>
-            <div className="flex justify-center items-center h-screen m-12 text-white">
+
+            <div className="flex justify-center items-center h-screen text-white">
                 <div className="flex md:flex-row flex-col justify-center items-center rounded-md bg-white overflow-hidden">
                     <div className="border-1 hidden md:flex border-white">
                         <img className="rounded-l-md h-1/2 w-96 overflow-hidden object-contain" src={regImage} alt="Registration" />
                     </div>
-                    <div className="flex flex-col gap-4 p-10 rounded-r-md bg-[#284B63]">
+                    <div className="flex flex-col gap-4 p-10 rounded-r-md bg-[#284B63] w-1/2">
                         <h1 className="text-3xl font-bold text-center">Signup</h1>
                         <form onSubmit={handleSubmit(registerUser)}>
                             <div className="flex profile flex-col items-center justify-center py-2">
@@ -56,8 +60,8 @@ function Signup() {
                                     type="file"
                                     name="profile"
                                     id="profile"
-                                    {...register("avatar")}
-                                    onChange={(e) => handleFileChange(e)}
+                                    onChangeCapture={(e) => handleFileChange(e)}
+                                    {...register("profile")}
                                 />
                                 <h1 className="font-semibold mt-3 text-xl">Upload Photo</h1>
                             </div>
@@ -84,25 +88,24 @@ function Signup() {
                                     })}
                                 />
                                 <Button
-                                    children="Signup"
+                                    children={loading ? "Loading..." : "Signup"}
                                     type="submit"
                                     textColor="text-black"
                                     className="font-semibold"
                                 />
                                 <p className="text-sm text-gray-300 font-semibold text-center">
-                                    Already Registered? <span className="text-red-400">Login now</span>
+                                    Already Registered? <span className="text-red-400"> <Link to={"/login"}>Login now</Link> </span>
                                 </p>
-                                {/* {error && (
+                                {error && (
                                     <p className="text-center px-4 py-2 text-red-600 rounded-lg mb-4 font-semibold">
                                         {error}
                                     </p>
-                                )} */}
+                                )}
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-
         </>
     );
 }

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 function Header() {
 
-    // const navigate = useNavigate()
+    const navigate = useNavigate()
     const navItems = [
         {
             name: "Home",
@@ -17,8 +17,8 @@ function Header() {
             isAuth: true
         },
         {
-            name: "Register",
-            path: "/register",
+            name: "Signup",
+            path: "/signup",
             isAuth: true
         },
     ]
@@ -33,9 +33,9 @@ function Header() {
                 <ul className='flex gap-2 font-semibold'>
                     {navItems.map((item, index) => item.isAuth ? (
                         <li key={index}>
-                            {/* <button onClick={e => navigate(item.path)}> */}
-                            {item.name}
-                            {/* </button> */}
+                            <button onClick={e => navigate(item.path)}>
+                                {item.name}
+                            </button>
                         </li>
                     ) : null)}
                 </ul>
