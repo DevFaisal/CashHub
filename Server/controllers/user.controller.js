@@ -3,17 +3,13 @@ import { ApiError } from '../utils/ApiError.js'
 import User from '../models/user.model.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from "../utils/ApiResponse.js"
+import JWT from 'jsonwebtoken'
 
 const registerUser = asyncHandler(async (req, res, next) => {
-
     const { fullName, email, password } = req.body;
 
     try {
-        if (
-            [fullName, email, password].some((field) => {
-                return field?.trim() === ""
-            })
-        ) {
+        if (![fullName, email, password].every(field => field?.trim())) {
             throw new ApiError(400, "All fields are required")
         }
 
@@ -31,62 +27,69 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
         const avatar = await uploadOnCloudinary(avatarLocalpath)
 
-        const craetedUser = await User.create({
+        const createdUser = await User.create({
             fullName,
             email,
             password,
             avatar: avatar.url
         })
-        if (craetedUser) {
 
+        if (createdUser) {
             return res.status(200).json(
-                new ApiResponse(200, craetedUser, "User Created")
+                new ApiResponse(200, createdUser, "User Created")
             )
-        }
-        else {
+        } else {
             throw new ApiError(500, "Internal Server Error")
         }
-
     } catch (error) {
-        res.status(error.statusCode).send(error.message)
+        next(error)
     }
 })
 
 const loginUser = asyncHandler(async (req, res, next) => {
-    //Check all fields are required
-    //Then search in the Database for the specific usee with his email
-    //Then return the body excluding password
-
     const { email, password } = req.body
+
     try {
-        if (!email || !password) throw new ApiError(400, "All fields are required")
+        if (!email || !password) {
+            throw new ApiError(400, "All fields are required")
+        }
 
         const user = await User.findOne({ email })
-        if (user) {
-            res.status(200).json(new ApiResponse(200, user, "User found"))
-        }
-        else {
+
+        if (!user) {
             throw new ApiError(410, "No User Found")
         }
-    }
-    catch (err) {
-        res.status(error.statusCode).send(error.message)
-    }
 
+        if (user.password !== password) {
+            throw new ApiError(400, "Wrong Password")
+        }
+
+        const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET || "secretkey", { expiresIn: "1d" })
+        res.cookie("token", token, { httpOnly: true })
+
+        return res.status(200).json(
+            new ApiResponse(200, user, "User Logged in")
+        )
+    } catch (error) {
+        next(error)
+    }
 })
 
 const currentUser = asyncHandler(async (req, res, next) => {
-
     const { email } = req.body
-    const user = await User.findOne({ email })
 
-    if (!user) {
-        throw new ApiError(404, "User not found")
+    try {
+        const user = await User.findOne({ email })
+
+        if (!user) {
+            throw new ApiError(404, "User not found")
+        }
+        return res.status(200).json(
+            new ApiResponse(200, user, "User found")
+        )
+    } catch (error) {
+        next(error)
     }
-
-    return res.status(200).json(
-        new ApiResponse(200, user, "User found")
-    )
 })
 
 export { registerUser, loginUser, currentUser }

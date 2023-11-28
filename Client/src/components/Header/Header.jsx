@@ -21,6 +21,11 @@ function Header() {
             path: "/signup",
             isAuth: true
         },
+        {
+            name: "Transactions",
+            path: "/allTransactions",
+            isAuth: true
+        },
     ]
 
     return (

@@ -33,8 +33,7 @@ const transection = asyncHandler(async (req, res, next) => {
 })
 
 const getTransection = asyncHandler(async (req, res, next) => {
-  const { userId } = req.query.userId
-  console.log("Backedn userID", userId)
+  const { userId } = req.query;
 
   if (!userId) return new ApiError(400, "Provide User ID")
 

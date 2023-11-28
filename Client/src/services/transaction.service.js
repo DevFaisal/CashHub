@@ -21,22 +21,15 @@ const newTransaction = async (data, userId) => {
 }
 
 const getAllTransaction = async (userId) => {
-    try {
-        console.log("This is user ID", userId);
-
-        // Make the Axios GET request with async/await
-        const response = await axios.get(`${import.meta.env.VITE_URL}user/gettransactions`, {
-            params: { userId }
-        });
-
-        console.log(response.data); // Log the response data
-
-        return response.data; // Return the response data
-
-    } catch (error) {
-        console.error(error);
-        return Error(); // You may want to handle this differently based on your application logic
-    }
-};
-
+    const trans = axios.get(`${import.meta.env.VITE_URL}user/gettransactions`,
+        { params: { userId } })
+        .then((res) => {
+            return res.data
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    if (!trans) return Error()
+    return trans;
+}
 export { newTransaction, getAllTransaction }

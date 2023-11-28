@@ -9,6 +9,7 @@ import Layout from './Layout.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
+import AllTransactionsPage from './pages/AllTransactionsPage.jsx'
 
 
 const router = createBrowserRouter(
@@ -17,6 +18,7 @@ const router = createBrowserRouter(
       <Route path='/home' element={<HomePage />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/signup' element={<SignupPage />} />
+      <Route path='/allTransactions' element={<AllTransactionsPage />} />
     </Route>
   )
 )

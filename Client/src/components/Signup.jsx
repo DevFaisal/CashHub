@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
 import { useForm } from "react-hook-form";
-import { createUserService } from "../services/user";
 import { avatar, regImage } from "../assets/images";
 import { Link, useNavigate } from 'react-router-dom'
+import { createUserService } from "../services/user.service";
 
 
 function Signup() {

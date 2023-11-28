@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
 import IncomeExpenses from '../components/IncomeExpenses';
-import PostTransaction from "../components/PostTransaction";
+
 import GetTransactions from './../components/GetTransactions';
 
 function HomePage() {
   const [name, setName] = useState("User")
   const [profile, setProfile] = useState(null)
   const authState = useSelector((state) => state.auth);
-
+  GetTransactions()
   useEffect(() => {
-    console.log(authState.userData.fullName)
     setName(authState.userData.fullName)
     setProfile(authState.userData.avatar)
   }, [])
 
   return (
     <>
+
       <div className="w-full h-screen">
         <div className="flex md:flex-row gap-5 md:gap-1 flex-col-reverse justify-between items-center p-10 mt-20 mx-5 md:mx-10 text-white bg-[#1D3557] rounded-lg">
           <div>
@@ -34,13 +34,13 @@ function HomePage() {
         <div className="flex flex-col md:flex-row justify-center gap-0 md:gap-4">
           <IncomeExpenses
             name="Income"
+            color="green"
           />
           <IncomeExpenses
             name="Expense"
+            color="red"
           />
         </div>
-        {/* <PostTransaction /> */}
-        <GetTransactions />
       </div>
     </>
   );

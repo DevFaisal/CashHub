@@ -3,7 +3,7 @@ import Input from "./Input";
 import Button from "./Button";
 import { regImage } from "../assets/images";
 import { Link, useNavigate } from 'react-router-dom'
-import { loginUserService, getCurrentUser } from "../services/user";
+import { loginUserService, getCurrentUser } from "../services/user.service";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { login as authLogin } from "../store/authStore";
@@ -17,25 +17,25 @@ function Login() {
     const [loading, setLoading] = useState(false);
 
     const authState = useSelector((state) => state.auth);
-    console.log(authState.userData);
 
     const login = async (data) => {
         setError("");
         try {
-            setLoading(true)
+            setLoading(true);
             const session = await getCurrentUser(data);
 
             if (session) {
                 const userData = await loginUserService(data);
                 if (userData) dispatch(authLogin(userData.data));
-                setLoading(false)
-                navigate("/home")
+                setLoading(false);
+                navigate("/home");
             } else {
-                setLoading(false)
+                setLoading(false);
                 setError("Invalid Credentials");
             }
         } catch (error) {
-            setError(error.message);
+            setLoading(false);
+            setError(error.response?.data || "An error occurred");
         }
     };
     return (
