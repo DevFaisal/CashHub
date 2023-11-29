@@ -24,21 +24,26 @@ function Signup() {
     };
 
     const registerUser = async (data) => {
-        setError("")
+        setError("");
         try {
-            setLoading(true)
-            const newUser = await createUserService(data)
+            setLoading(true);
+
+            // Attempt to create a new user
+            const newUser = await createUserService(data);
 
             if (newUser) {
-                setLoading(false)
-                navigate('/login')
+                // If user creation is successful, update state and navigate to login
+                setLoading(false);
+                navigate('/login');
             }
 
         } catch (error) {
-            setLoading(false)
-            setError(error.response.data || 'An error occurred. Please try again.');
+            // Handle errors during user registration
+            setLoading(false);
+            setError(error.response?.data || 'An error occurred. Please try again.');
         }
-    }
+    };
+
 
     return (
         <>

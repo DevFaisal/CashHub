@@ -22,10 +22,8 @@ function GetTransactions() {
                 // TODO: Handle the error and display an error message
             }
         }
-
         allTransaction()
-    }, [userId]) // Add an empty dependency array to run the effect only once
-
+    }) 
 
     return (
         <>

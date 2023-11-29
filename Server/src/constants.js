@@ -1,1 +1,1 @@
-export const DB_NAME = 'NIELIT';
+export const DB_NAME = 'CashHub';

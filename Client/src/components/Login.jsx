@@ -19,25 +19,44 @@ function Login() {
     const authState = useSelector((state) => state.auth);
 
     const login = async (data) => {
+        if (data.email.length < 4 && !data.password.length < 4) {
+            setError("Please fill in all fields");
+            return;
+        }
+        console.log(data)
         setError("");
         try {
             setLoading(true);
+
+            // Check if the user is authenticated
             const session = await getCurrentUser(data);
 
             if (session) {
+                // If authenticated, proceed with login
                 const userData = await loginUserService(data);
-                if (userData) dispatch(authLogin(userData.data));
-                setLoading(false);
-                navigate("/home");
+
+                if (userData) {
+                    dispatch(authLogin(userData.data));
+                    setLoading(false);
+                    navigate("/home");
+                } else {
+                    // Handle case where user data is not available
+                    setLoading(false);
+                    setError("Failed to retrieve user data");
+                }
             } else {
+                // Handle case where authentication fails
                 setLoading(false);
                 setError("Invalid Credentials");
             }
         } catch (error) {
+            // Handle any unexpected errors
             setLoading(false);
+            console.log(error)
             setError(error.response?.data || "An error occurred");
         }
     };
+
     return (
         <>
             <div className="flex justify-center items-center h-screen text-white">

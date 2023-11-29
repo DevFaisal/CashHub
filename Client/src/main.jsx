@@ -10,13 +10,17 @@ import LoginPage from './pages/LoginPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import SignupPage from './pages/SignupPage.jsx'
 import AllTransactionsPage from './pages/AllTransactionsPage.jsx'
+import Logout from './components/Logout.jsx'
+import Landingpage from './pages/Landingpage.jsx'
 
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<Layout />}>
+      <Route path='/' element={<Landingpage />} />
       <Route path='/home' element={<HomePage />} />
       <Route path='/login' element={<LoginPage />} />
+      <Route path='/logout' element={<Logout />} />
       <Route path='/signup' element={<SignupPage />} />
       <Route path='/allTransactions' element={<AllTransactionsPage />} />
     </Route>
